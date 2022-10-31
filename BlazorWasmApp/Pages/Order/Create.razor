@@ -82,8 +82,7 @@ else
             var response = await _http.PostAsJsonAsync("api/order", order);
             var contents = await response.Content.ReadFromJsonAsync<OrderCreateResponseModel>();
 
-            order = new();
-            //_navigationManager.NavigateTo("order/display");
+            _navigationManager.NavigateTo($"order/display/{contents.Id}");
         }
         catch (Exception e)
         {

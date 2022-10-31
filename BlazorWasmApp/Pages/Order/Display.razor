@@ -1,0 +1,81 @@
+﻿@page "/Order/Display/{Id:int}"
+
+
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+
+<h3>Display</h3>
+
+@if(string.IsNullOrWhiteSpace(errorString) == false)
+{
+    <h4>System Error</h4>
+    <h4>@errorString</h4>
+}
+else if( orderInfo.Order is null)
+{
+    <h4> Record Loading...</h4>
+}
+else
+{
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>Order Name</strong></td>
+                    <td>@orderInfo.Order.OrderName</td>
+                </tr>
+                <tr>
+                    <td><strong>Order Date</strong></td>
+                    <td>@orderInfo.Order.OrderDate</td>
+                </tr>
+                <tr>
+                    <td><strong>Order Total</strong></td>
+                    <td>@orderInfo.Order.Total.ToString("C",CultureInfo.CreateSpecificCulture("en-US"))</td>
+                </tr>
+                <tr>
+                    <td><strong>Item Ordered</strong></td>
+                    <td>@orderInfo.ItemPurchased</td>
+                </tr>
+                <tr>
+                    <td><strong>Quantity Ordered</strong></td>
+                    <td>@orderInfo.Order.Quantity</td>
+                </tr>
+                @*<tr>
+                    <td colspan="2">
+                    @if (confirmDelete == true)
+                    {
+                            <button class="btn btn-outline-danger" @onclick="HandleOrderDeleteAsync">Confirm Order</button>
+                            <button class="btn btn-secondary" @onclick="(() => confirmDelete = false)">Cancel</button>
+                    }
+                    else
+                    {
+                            <button class="btn btn-danger" @onclick="(() => confirmDelete = true)">Delete Order</button>
+                    }
+                    </td>
+                </tr>*@
+        </tbody>
+        </table>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private OrderResultModel orderInfo = new();
+    private string errorString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpResponseMessage response = await _http.GetAsync($"api/order/{Id}");
+
+        if(response.IsSuccessStatusCode)
+        {
+            orderInfo = await response.Content.ReadFromJsonAsync<OrderResultModel>();
+        }
+        else
+        {
+            errorString = response.ReasonPhrase;
+        }
+    }
+}
