@@ -40,7 +40,7 @@ else
                     <td><strong>Quantity Ordered</strong></td>
                     <td>@orderInfo.Order.Quantity</td>
                 </tr>
-                @*<tr>
+                <tr>
                     <td colspan="2">
                     @if (confirmDelete == true)
                     {
@@ -52,7 +52,7 @@ else
                             <button class="btn btn-danger" @onclick="(() => confirmDelete = true)">Delete Order</button>
                     }
                     </td>
-                </tr>*@
+                </tr>
         </tbody>
         </table>
 
@@ -80,6 +80,9 @@ else
     private OrderResultModel orderInfo = new();
     private OrderUpdateModel updateModel = new();
     private string errorString;
+    private bool confirmDelete = false;
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,6 +110,20 @@ else
         catch (Exception ex)
         {
             errorString = ex.Message;
+        }
+    }
+
+    private async Task HandleOrderDeleteAsync()
+    {
+        HttpResponseMessage response = await _http.DeleteAsync($"api/order/{Id}");
+
+        if(response.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo("Food/List");
+        }
+        else
+        {
+            errorString = response.ReasonPhrase;
         }
     }
 }
